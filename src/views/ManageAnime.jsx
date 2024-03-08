@@ -108,7 +108,7 @@ export default function ManageAnime() {
               <tr key={anime.id}>
                 <td>{anime.name}</td>
                 <td>{anime.format}</td>
-                <td>{anime.numepisodes}</td>
+                <td>{anime.episodes}</td>
                 <td>{anime.epduration} min.</td>
                 <td>{anime.studios.join(", ")}</td>
                 <td>{anime.genres.join(", ")}</td>
