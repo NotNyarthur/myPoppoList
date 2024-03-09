@@ -12,10 +12,11 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Sheet from "@mui/joy/Sheet";
 
-
 export default function ManageAnime() {
   const [anime, setAnime] = useState([]);
   const [open, setOpen] = React.useState(false);
+  const [selectedAnimeId, setSelectedAnimeId] = useState(null);
+  const [selectedAnimeName, setSelectedAnimeName] = useState("");
 
   const { data, error, isLoading, refetch } = useData(
     `${import.meta.env.VITE_ENDPOINT_BASE}/anime`
@@ -29,32 +30,36 @@ export default function ManageAnime() {
     console.log(data);
   }, [data]);
 
-  const handleDelete = (id) => {
-    deleteProduct(id)
-      .then(() => {
-        setOpen(false);
-        refetch();
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
-  const handleClickOpen = (animeId) => {
+  const handleClickOpen = (animeId, animeName) => {
     setSelectedAnimeId(animeId);
+    setSelectedAnimeName(animeName);
     setOpen(true);
   };
 
   const handleClose = () => {
+    setSelectedAnimeId(null);
     setOpen(false);
   };
 
-  const [selectedAnimeId, setSelectedAnimeId] = useState(null);
+  const handleDelete = () => {
+    if (selectedAnimeId !== null) {
+      deleteProduct(selectedAnimeId)
+        .then(() => {
+          setOpen(false);
+          refetch();
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  };
 
   return (
     <div className="mx-auto max-w-screen-2xl items-center gap-8 px-4 sm:px-6 lg:px-8">
       <Typography level="h2">
-        <span className="text-lg py-2 font-semibold">Lista de todo el anime</span>
+        <span className="text-lg py-2 font-semibold">
+          Lista de todo el anime
+        </span>
       </Typography>
       <Sheet
         sx={{
@@ -123,7 +128,7 @@ export default function ManageAnime() {
                         size="sm"
                         variant="soft"
                         color="danger"
-                        onClick={() => handleClickOpen(anime.id)}
+                        onClick={() => handleClickOpen(anime.id, anime.name)} // Pasa el animeId al hacer clic en "Borrar"
                       >
                         Borrar
                       </Button>
@@ -140,7 +145,7 @@ export default function ManageAnime() {
                           <DialogContentText id="alert-dialog-description">
                             ¿Estás segurísimo que deseas continuar? Si
                             continúas, se eliminará{" "}
-                            <span className="font-semibold">{anime.name}</span>{" "}
+                            <span className="font-semibold">{selectedAnimeName}</span>{" "}
                             de la base de datos.
                           </DialogContentText>
                         </DialogContent>
@@ -153,7 +158,7 @@ export default function ManageAnime() {
                             Cancelar
                           </Button>
                           <Button
-                            onClick={() => handleDelete(anime.id)}
+                            onClick={handleDelete}
                             variant="plain"
                             color="danger"
                             autoFocus
