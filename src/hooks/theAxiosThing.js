@@ -26,8 +26,8 @@ api.interceptors.response.use(
 );
 
 export const saveAnime = (anime) => {
-  return axios
-    .post(`${import.meta.env.VITE_ENDPOINT_BASE}/anime`, anime)
+  return api
+    .post("/api/animes/create", anime)
     .then((response) => {
       return response.data;
     })
@@ -37,8 +37,8 @@ export const saveAnime = (anime) => {
 };
 
 export const deleteAnime = (id) => {
-  return axios
-    .delete(`${import.meta.env.VITE_ENDPOINT_BASE}/anime/${id}`)
+  return api
+    .delete(`/api/animes/delete/${id}`)
     .then((response) => {
       return response.data;
     })
@@ -48,8 +48,8 @@ export const deleteAnime = (id) => {
 };
 
 export const updateAnime = (id, updatedFields) => {
-  return axios
-    .put(`${import.meta.env.VITE_ENDPOINT_BASE}/anime/${id}`, updatedFields)
+  return api
+    .put(`/api/animes/update/${id}`, updatedFields)
     .then((response) => {
       return response.data;
     })
@@ -89,11 +89,19 @@ export const useData = (url, options = { method: "get", data: null }) => {
   return { data, error, loading, refetch };
 };
 
-// export default { getAnimes, useData };
-
 export const getAnimeData = async () => {
   try {
     const response = await api.get("/api/animes/all");
+    return response.data;
+  } catch (error) {
+    console.error("Fetch error: ", error);
+    return null;
+  }
+};
+
+export const getGenresData = async () => {
+  try {
+    const response = await api.get("/api/genres/all");
     return response.data;
   } catch (error) {
     console.error("Fetch error: ", error);
