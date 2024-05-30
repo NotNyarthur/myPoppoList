@@ -1,8 +1,8 @@
-import { updateProduct } from "../hooks/theAxiosThing";
+import { updateAnime } from "../hooks/theAxiosThing";
 
 export const updateField = (fieldName, newValue, animeId, setAnime) => {
   const updatedFields = { [fieldName]: newValue };
-  updateProduct(animeId, updatedFields)
+  updateAnime(animeId, updatedFields)
     .then((updatedAnime) => {
       setAnime(updatedAnime);
     })

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { deleteProduct, useData } from "../hooks/theAxiosThing";
+import { deleteAnime, getAnimeData} from "../hooks/theAxiosThing";
 import Table from "@mui/joy/Table";
 import Button from "@mui/joy/Button";
 import Box from "@mui/joy/Box";
@@ -11,6 +11,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Sheet from "@mui/joy/Sheet";
+import { LinearProgress } from "@mui/joy";
 
 export default function ManageAnime() {
   const [anime, setAnime] = useState([]);
@@ -18,17 +19,29 @@ export default function ManageAnime() {
   const [selectedAnimeId, setSelectedAnimeId] = useState(null);
   const [selectedAnimeName, setSelectedAnimeName] = useState("");
 
-  const { data, error, isLoading, refetch } = useData(
-    `${import.meta.env.VITE_ENDPOINT_BASE}/anime`
-  );
-
-  if (isLoading) return <LinearProgress color="success" variant="soft" />;
-  if (error) return <Alert color="danger">Error: {error.message} </Alert>;
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    setAnime(data);
-    console.log(data);
-  }, [data]);
+    getAnimeData()
+      .then((data) => {
+        if (!data) {
+          setError("Error recuperando los datos");
+          setLoading(false);
+          return;
+        }
+
+        setAnime(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setError("Error recuperando los datos");
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) return <LinearProgress color="success" variant="soft" />;
+  if (error) return <Alert color="danger">Error: {error.message} </Alert>;
 
   const handleClickOpen = (animeId, animeName) => {
     setSelectedAnimeId(animeId);
@@ -43,7 +56,7 @@ export default function ManageAnime() {
 
   const handleDelete = () => {
     if (selectedAnimeId !== null) {
-      deleteProduct(selectedAnimeId)
+      deleteAnime(selectedAnimeId)
         .then(() => {
           setOpen(false);
           refetch();
@@ -113,10 +126,14 @@ export default function ManageAnime() {
               <tr key={anime.id}>
                 <td>{anime.name}</td>
                 <td>{anime.format}</td>
-                <td>{anime.episodes}</td>
-                <td>{anime.epduration} min.</td>
-                <td>{anime.studios.join(", ")}</td>
-                <td>{anime.genres.join(", ")}</td>
+                <td>{anime.episodios}</td>
+                <td>{anime.ep_duration} min.</td>
+                <td>
+                  {anime.studios.map((studio) => studio.studio.name).join(", ")}
+                </td>
+                <td>
+                  {anime.genres.map((genre) => genre.genre.name).join(", ")}
+                </td>
                 <td>{anime.japanesename}</td>
                 <td>
                   <Box sx={{ display: "flex", gap: 1 }} className="flex-wrap">
@@ -145,7 +162,9 @@ export default function ManageAnime() {
                           <DialogContentText id="alert-dialog-description">
                             ¿Estás segurísimo que deseas continuar? Si
                             continúas, se eliminará{" "}
-                            <span className="font-semibold">{selectedAnimeName}</span>{" "}
+                            <span className="font-semibold">
+                              {selectedAnimeName}
+                            </span>{" "}
                             de la base de datos.
                           </DialogContentText>
                         </DialogContent>

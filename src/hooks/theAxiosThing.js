@@ -1,6 +1,30 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
+const api = axios.create({
+  baseURL: API_URL,
+});
+
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response.status === 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/login";
+    }
+  }
+);
+
 export const saveAnime = (anime) => {
   return axios
     .post(`${import.meta.env.VITE_ENDPOINT_BASE}/anime`, anime)
@@ -12,7 +36,7 @@ export const saveAnime = (anime) => {
     });
 };
 
-export const deleteProduct = (id) => {
+export const deleteAnime = (id) => {
   return axios
     .delete(`${import.meta.env.VITE_ENDPOINT_BASE}/anime/${id}`)
     .then((response) => {
@@ -23,7 +47,7 @@ export const deleteProduct = (id) => {
     });
 };
 
-export const updateProduct = (id, updatedFields) => {
+export const updateAnime = (id, updatedFields) => {
   return axios
     .put(`${import.meta.env.VITE_ENDPOINT_BASE}/anime/${id}`, updatedFields)
     .then((response) => {
@@ -66,3 +90,13 @@ export const useData = (url, options = { method: "get", data: null }) => {
 };
 
 // export default { getAnimes, useData };
+
+export const getAnimeData = async () => {
+  try {
+    const response = await api.get("/api/animes/all");
+    return response.data;
+  } catch (error) {
+    console.error("Fetch error: ", error);
+    return null;
+  }
+};

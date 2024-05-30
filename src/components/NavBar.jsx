@@ -1,14 +1,36 @@
-import * as React from "react";
+import React, { useEffect, useState } from "react";
 import Box from "@mui/joy/Box";
 import Drawer from "@mui/joy/Drawer";
 import List from "@mui/joy/List";
 import Divider from "@mui/joy/Divider";
 import ListItem from "@mui/joy/ListItem";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import imagenlogo from "../assets/popposmug.webp";
+import { useUser } from "../contexts/UserContext";
 
 export default function NavBar() {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
+
+  const { user, setUser } = useUser();
+
+  // const username = localStorage.getItem("user");
+  // const token = localStorage.getItem("token");
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const username = localStorage.getItem("user");
+    if (username) {
+      setUser(username);
+    }
+  }, [setUser]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    setUser(null);
+    navigate("/login");
+  };
 
   const toggleDrawer = (inOpen) => (event) => {
     if (
@@ -53,17 +75,38 @@ export default function NavBar() {
                       Administrar{" "}
                     </Link>
                   </li>
+
+                  {user ? (
+                    <li>
+                      <Link
+                        to="/addanime"
+                        className="text-gray-500 transition hover:text-gray-500/75"
+                      >
+                        {" "}
+                        Añadir anime{" "}
+                      </Link>
+                    </li>
+                  ) : null}
                 </ul>
               </nav>
 
               <div className="flex items-center gap-4">
                 <div className="sm:flex sm:gap-4">
-                  <Link
-                    to="/addanime"
-                    className="hidden rounded-md bg-[#0B6BCB] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#185EA5] sm:block"
-                  >
-                    Añadir anime
-                  </Link>
+                  {user ? (
+                    <button
+                      onClick={handleLogout}
+                      className="hidden rounded-md bg-[#0B6BCB] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#185EA5] sm:block"
+                    >
+                      Cerrar sesión
+                    </button>
+                  ) : (
+                    <Link
+                      to="/login"
+                      className="hidden rounded-md bg-[#0B6BCB] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#185EA5] sm:block"
+                    >
+                      Iniciar sesión
+                    </Link>
+                  )}
                 </div>
 
                 <button
@@ -117,20 +160,36 @@ export default function NavBar() {
           >
             <List>
               <ListItem>
-                <Link>Todos los animes</Link>
+                <Link to="/allanime">Todos los animes</Link>
               </ListItem>
-              <ListItem>
-                <Link to="/manageanime">Administrar</Link>
-              </ListItem>
+              {user ? (
+                <ListItem>
+                  <Link to="/manageanime">Administrar</Link>
+                </ListItem>
+              ) : null}
+              {user ? (
+                <ListItem>
+                  <Link to="/addanime">Añadir anime</Link>
+                </ListItem>
+              ) : null}
             </List>
             <Divider />
 
-            <Link
-              to="/addanime"
-              className="rounded-md bg-[#0B6BCB] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#185EA5] "
-            >
-              Añadir anime
-            </Link>
+            {user ? (
+              <button
+                onClick={handleLogout}
+                className="hidden rounded-md bg-[#0B6BCB] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#185EA5] sm:block"
+              >
+                Cerrar sesión
+              </button>
+            ) : (
+              <Link
+                to="/login"
+                className="hidden rounded-md bg-[#0B6BCB] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#185EA5] sm:block"
+              >
+                Iniciar sesión
+              </Link>
+            )}
           </Box>
         </Drawer>
       </Box>
