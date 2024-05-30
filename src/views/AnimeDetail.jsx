@@ -195,12 +195,12 @@ export default function AnimeDetail() {
             />
           ) : (
             <Typography level="h2">
-              <p
+              <span
                 className="text-md text-justify"
                 onDoubleClick={() => setEditName(true)}
               >
                 {anime.name || "Agregar nombre"}
-              </p>
+              </span>
             </Typography>
           )}
         </div>
