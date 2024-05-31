@@ -70,37 +70,6 @@ export const uploadPicture = (fields) => {
     });
 };
 
-export const useData = (url, options = { method: "get", data: null }) => {
-  const [data, setData] = useState([]);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const response = await axios({ url, ...options });
-      setData(response.data);
-    } catch (error) {
-      setError(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    const getData = async () => {
-      fetchData();
-    };
-    getData();
-  }, [url, options.method, options.data]);
-
-  const refetch = () => {
-    fetchData();
-  };
-
-  return { data, error, loading, refetch };
-};
-
 export const getAnimeData = async () => {
   try {
     const response = await api.get("/api/animes/all");
