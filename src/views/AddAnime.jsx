@@ -194,7 +194,7 @@ export default function AddAnime() {
             getOptionLabel={(option) => option.label} // Así solo usa la etiqueta y no todo el objeto
             onChange={(evento, value) => {
               if (value) {
-                changeForm({ target: { name: "format", value: value.label } }); // Y aquí solo devuelve el valor
+                changeForm({ target: { name: "format", value: value.value } }); // Y aquí solo devuelve el valor
               }
             }}
           />
@@ -427,9 +427,10 @@ export default function AddAnime() {
 }
 
 const tipoAnime = [
-  { label: "TV" },
-  { label: "Película" },
-  { label: "ONA" },
-  { label: "OVA" },
-  { label: "Especial" },
+  { label: "TV", value: "TV" },
+  { label: "Película", value: "Movie" },
+  { label: "ONA", value: "ONA" },
+  { label: "OVA", value: "OVA" },
+  { label: "Especial", value: "Special" },
 ];
+

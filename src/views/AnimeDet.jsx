@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getAnimeById, useData } from "../hooks/theAxiosThing";
+import { getAnimeById } from "../hooks/theAxiosThing";
 import Typography from "@mui/joy/Typography";
 import Divider from "@mui/joy/Divider";
 import AccordionGroup from "@mui/joy/AccordionGroup";
@@ -14,13 +14,6 @@ import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import ListItemDecorator from "@mui/joy/ListItemDecorator";
 import LinearProgress from "@mui/joy/LinearProgress";
 import Alert from "@mui/joy/Alert";
-import { updateField } from "../components/UtilitiesDetail";
-import Input from "@mui/joy/Input";
-import Autocomplete from "@mui/joy/Autocomplete";
-import Chip from "@mui/joy/Chip";
-import ChipDelete from "@mui/joy/ChipDelete";
-import { uploadFile } from "../services/storageService";
-import Button from "@mui/material/Button";
 
 export default function AnimeDet() {
   const [index, setIndex] = useState(0);
