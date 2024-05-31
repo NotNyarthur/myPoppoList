@@ -51,7 +51,7 @@ export const updateAnime = (id, updatedFields) => {
   return api
     .put(`/api/animes/update/${id}`, updatedFields)
     .then((response) => {
-      console.log(response.data.picture)
+      console.log(response.data.picture);
       return response.data.picture;
     })
     .catch((error) => {
@@ -108,6 +108,20 @@ export const getAnimeData = async () => {
   } catch (error) {
     console.error("Fetch error: ", error);
     return null;
+  }
+};
+
+export const refetchAnimeData = async (setAnime, setLoading, setError) => {
+  try {
+    setLoading(true);
+    const response = await api.get("/api/animes/all");
+    const data = response.data;
+    setAnime(data);
+    setLoading(false);
+  } catch (error) {
+    console.error("Fetch error: ", error);
+    setError("Error recuperando los datos");
+    setLoading(false);
   }
 };
 

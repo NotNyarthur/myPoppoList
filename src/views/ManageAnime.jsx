@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { deleteAnime, getAnimeData} from "../hooks/theAxiosThing";
+import {
+  deleteAnime,
+  getAnimeData,
+  refetchAnimeData,
+} from "../hooks/theAxiosThing";
 import Table from "@mui/joy/Table";
 import Button from "@mui/joy/Button";
 import Box from "@mui/joy/Box";
@@ -40,6 +44,10 @@ export default function ManageAnime() {
       });
   }, []);
 
+  useEffect(() => {
+    refetchAnimeData(setAnime, setLoading, setError);
+  }, []);
+
   if (loading) return <LinearProgress color="success" variant="soft" />;
   if (error) return <Alert color="danger">Error: {error.message} </Alert>;
 
@@ -59,10 +67,10 @@ export default function ManageAnime() {
       deleteAnime(selectedAnimeId)
         .then(() => {
           setOpen(false);
-          refetch();
+          return refetchAnimeData(setAnime, setLoading, setError);
         })
         .catch((error) => {
-          console.log(error);
+          console.error("Error deleting anime: ", error);
         });
     }
   };
@@ -70,9 +78,7 @@ export default function ManageAnime() {
   return (
     <div className="mx-auto max-w-screen-2xl items-center gap-8 px-4 sm:px-6 lg:px-8">
       <Typography level="h2">
-        <span className="text-2xl py-2 font-bold">
-          Lista de todo el anime
-        </span>
+        <span className="text-2xl py-2 font-bold">Lista de todo el anime</span>
       </Typography>
       <Sheet
         sx={{
