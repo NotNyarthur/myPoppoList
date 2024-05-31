@@ -70,7 +70,7 @@ export default function ManageAnime() {
   return (
     <div className="mx-auto max-w-screen-2xl items-center gap-8 px-4 sm:px-6 lg:px-8">
       <Typography level="h2">
-        <span className="text-lg py-2 font-semibold">
+        <span className="text-2xl py-2 font-bold">
           Lista de todo el anime
         </span>
       </Typography>

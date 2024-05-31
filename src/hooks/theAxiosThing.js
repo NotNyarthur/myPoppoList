@@ -108,3 +108,13 @@ export const getGenresData = async () => {
     return null;
   }
 };
+
+export const getAnimeById = async (id) => {
+  try {
+    const response = await api.get(`/api/animes/id/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Fetch error: ", error);
+    return null;
+  }
+}

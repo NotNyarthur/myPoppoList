@@ -66,7 +66,7 @@ export default function NavBar() {
                     </Link>
                   </li>
 
-                  <li>
+                  {user ? (<li>
                     <Link
                       to="/manageanime"
                       className="text-gray-500 transition hover:text-gray-500/75"
@@ -74,7 +74,7 @@ export default function NavBar() {
                       {" "}
                       Administrar{" "}
                     </Link>
-                  </li>
+                  </li>) : null}
 
                   {user ? (
                     <li>

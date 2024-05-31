@@ -17,6 +17,7 @@ import AllAnime from "./views/AllAnime";
 import { AuthContext } from "./contexts/AuthContext";
 import { UserProvider, useUser } from "./contexts/UserContext.jsx";
 import Login from "./views/Login";
+import AnimeDet from "./views/AnimeDet.jsx";
 
 const PrivateRoute = ({ children }) => {
   const { token } = useContext(AuthContext);
@@ -33,7 +34,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/detail/:id" element={<AnimeDetail />} />
+            <Route path="/detail/:id" element={<AnimeDet />} />
             {/* <Route path="/manageanime" element={<ManageAnime />} /> */}
             <Route
               path="/manageanime"
