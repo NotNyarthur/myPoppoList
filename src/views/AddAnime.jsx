@@ -1,5 +1,10 @@
 import React, { useEffect, useState, useRef } from "react";
-import { saveAnime } from "../hooks/theAxiosThing";
+import {
+  getGenresData,
+  getStudiosData,
+  saveAnime,
+  uploadPicture,
+} from "../hooks/theAxiosThing";
 import Button from "@mui/joy/Button";
 import Input from "@mui/joy/Input";
 import Add from "@mui/icons-material/Add";
@@ -8,10 +13,7 @@ import FormLabel from "@mui/joy/FormLabel";
 import FormHelperText from "@mui/joy/FormHelperText";
 import Typography from "@mui/joy/Typography";
 import Autocomplete from "@mui/joy/Autocomplete";
-import Chip from "@mui/joy/Chip";
-import ChipDelete from "@mui/joy/ChipDelete";
 import Textarea from "@mui/joy/Textarea";
-import { uploadFile } from "../services/storageService";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -23,26 +25,43 @@ export default function AddAnime() {
   const [form, setForm] = useState({
     name: "",
     season: "",
-    startdate: "",
-    enddate: "",
-    format: "",
-    studios: [],
-    synopsis: "",
-    genres: [],
+    format: "TV",
+    start_date: "",
+    end_date: "",
+    episodios: 1,
+    ep_duration: 1,
     englishname: "",
     japanesename: "",
     picture: "",
-    epduration: 0,
-    episodes: 0,
+    synopsis: "",
+    studios: [],
+    genres: [],
   });
 
   const [values, setValues] = useState([]);
   const [currValue, setCurrValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   const formRef = useRef(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [imagenAnime, setImagenAnime] = useState(null);
+  const [genres, setGenres] = useState([]);
+  const [studios, setStudios] = useState([]);
+
+  useEffect(() => {
+    getGenresData().then((data) => setGenres(data));
+    getStudiosData().then((data) => setStudios(data));
+  }, []);
+
+  const handleGenreChange = (event, values) => {
+    const selectedGenres = values.map((value) => ({ genreId: value.id }));
+    setForm({ ...form, genres: selectedGenres });
+  };
+
+  const handleStudioChange = (event, values) => {
+    const selectedStudios = values.map((value) => ({ studioId: value.id }));
+    setForm({ ...form, studios: selectedStudios });
+  };
 
   const changeForm = (evento) => {
     const copyStateForm = {
@@ -51,18 +70,6 @@ export default function AddAnime() {
     };
     console.log("COPYSTATEFORM", copyStateForm);
     setForm(copyStateForm);
-  };
-
-  const handleKeyUp = (e) => {
-    // console.log(e.keyCode);
-    if (e.keyCode === 188) {
-      // 188 es el código de la coma
-      e.preventDefault();
-      const updatedValues = [...values, currValue];
-      setValues(updatedValues);
-      setCurrValue(""); // Borra el input para escribir otro nuevo valor
-      changeForm({ target: { name: "studios", value: updatedValues } }); // Agrega cada item al array de studios luego de escribir la coma
-    }
   };
 
   useEffect(() => {
@@ -77,11 +84,10 @@ export default function AddAnime() {
     let arr = [...values];
     arr.splice(index, 1);
     setValues(arr);
-    changeForm({ target: { name: "studios", value: arr } }); // Si se borra un item, actualiza el array de studios
+    changeForm({ target: { name: "studios", value: arr } });
   };
 
   const handleImage = (evento) => {
-    console.log("HANDLE IMAGE", evento.target.files[0]);
     setImagenAnime(evento.target.files[0]);
   };
 
@@ -89,42 +95,56 @@ export default function AddAnime() {
     setDialogOpen(false);
   };
 
-  const handleAdd = (event) => {
+  const handleAdd = async (event) => {
     event.preventDefault();
+
     if (!form.picture) {
       form.picture =
         "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/default.jpg";
     }
 
     setIsLoading(true);
-    let savePicture;
-    if (imagenAnime) {
-      savePicture = uploadFile(imagenAnime, "anime").then((urlImagen) => {
-        const updatedForm = { ...form, picture: urlImagen };
-        return saveAnime(updatedForm);
-      });
-    } else {
-      savePicture = saveAnime(form);
-    }
 
-    savePicture
-      .then(() => {
-        handleClose();
-      })
-      .then(() => {
-        if (formRef.current) {
-          formRef.current.reset();
-          setForm({});
-          setDialogOpen(true);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        setIsLoading(false);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+    try {
+      let updatedForm = { ...form };
+
+      if (imagenAnime) {
+        const formData = new FormData();
+        formData.append("image", imagenAnime);
+
+        const secure_url = await uploadPicture(formData);
+        updatedForm.picture = secure_url.picture;
+      }
+      console.log(updatedForm.picture)
+      console.log(updatedForm)
+      await saveAnime(updatedForm);
+
+      handleClose();
+
+      if (formRef.current) {
+        formRef.current.reset();
+        setForm({
+          name: "",
+          season: "",
+          format: "TV",
+          start_date: "",
+          end_date: "",
+          episodios: 1,
+          ep_duration: 1,
+          englishname: "",
+          japanesename: "",
+          picture: "",
+          synopsis: "",
+          studios: [],
+          genres: [],
+        });
+        setDialogOpen(true);
+      }
+    } catch (error) {
+      console.error("Error handling add:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleClickOpen = () => {
@@ -207,7 +227,7 @@ export default function AddAnime() {
           <Input
             type="date"
             required
-            name="startdate"
+            name="start_date"
             onChange={(evento) => {
               changeForm(evento);
             }}
@@ -218,7 +238,7 @@ export default function AddAnime() {
           <Input
             type="date"
             required
-            name="enddate"
+            name="end_date"
             onChange={(evento) => {
               changeForm(evento);
             }}
@@ -236,31 +256,24 @@ export default function AddAnime() {
           />
         </FormControl>
         <FormControl className="pb-4">
-          <FormLabel>Estudio</FormLabel>
-          <Input
-            placeholder="A-1 Pictures"
-            value={currValue}
-            onChange={handleChange}
-            onKeyDown={handleKeyUp}
+          <FormLabel>Estudios</FormLabel>
+          <Autocomplete
+            multiple
+            required
+            placeholder="Escribe para buscar..."
+            options={studios}
             name="studios"
+            getOptionLabel={(option) => option.name}
+            onChange={(evento, values) => {
+              const selectedStudios = values.map((value) => ({
+                studioId: value.id,
+              })); // Crear un array de objetos { studioId: id }
+              changeForm({
+                target: { name: "studios", value: selectedStudios },
+              }); // Usa el array de objetos como el valor para el campo "studios"
+            }}
           />
-          <div className="container">
-            {values.map((item, index) => (
-              <Chip
-                key={index}
-                size="lg"
-                variant="solid"
-                endDecorator={
-                  <ChipDelete onDelete={() => handleDelete(item, index)} />
-                }
-              >
-                {item}
-              </Chip>
-            ))}
-          </div>
-          <FormHelperText>
-            Añade y separa cada estudio con una coma.
-          </FormHelperText>
+          <FormHelperText>Puedes escoger varias opciones.</FormHelperText>
         </FormControl>
         <FormControl className="pb-4">
           <FormLabel>Sinopsis</FormLabel>
@@ -274,17 +287,19 @@ export default function AddAnime() {
           />
         </FormControl>
         <FormControl className="pb-4">
-          <FormLabel>Género</FormLabel>
+          <FormLabel>Géneros</FormLabel>
           <Autocomplete
             multiple
             required
             placeholder="Escribe para buscar..."
-            options={genAnime}
+            options={genres}
             name="genres"
-            getOptionLabel={(option) => option.label}
+            getOptionLabel={(option) => option.name}
             onChange={(evento, values) => {
-              const selectedLabels = values.map((value) => value.label); // Crea un array de etiquetas seleccionadas
-              changeForm({ target: { name: "genres", value: selectedLabels } }); // Usa el array de etiquetas como el valor para el campo "format"
+              const selectedGenres = values.map((value) => ({
+                genreId: value.id,
+              }));
+              changeForm({ target: { name: "genres", value: selectedGenres } });
             }}
           />
           <FormHelperText>Puedes escoger varias opciones.</FormHelperText>
@@ -317,7 +332,7 @@ export default function AddAnime() {
             type="number"
             placeholder="1"
             required
-            name="epduration"
+            name="ep_duration"
             onChange={(evento) => {
               changeForm({
                 target: {
@@ -417,26 +432,4 @@ const tipoAnime = [
   { label: "ONA" },
   { label: "OVA" },
   { label: "Especial" },
-];
-
-const genAnime = [
-  { label: "Acción" },
-  { label: "Aventura" },
-  { label: "Comedia" },
-  { label: "Ciencia Ficción" },
-  { label: "Comida" },
-  { label: "Drama" },
-  { label: "Ecchi" },
-  { label: "Fantasía" },
-  { label: "Mecha" },
-  { label: "Misterio" },
-  { label: "Amor entre chicos" },
-  { label: "Amor entre chicas" },
-  { label: "Romance" },
-  { label: "Deportes" },
-  { label: "Sobrenatural" },
-  { label: "Suspenso" },
-  { label: "Terror" },
-  { label: "Vida diaria" },
-  { label: "Vanguardia" },
 ];

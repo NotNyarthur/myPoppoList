@@ -51,6 +51,18 @@ export const updateAnime = (id, updatedFields) => {
   return api
     .put(`/api/animes/update/${id}`, updatedFields)
     .then((response) => {
+      console.log(response.data.picture)
+      return response.data.picture;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+export const uploadPicture = (fields) => {
+  return api
+    .post("/api/animes/uploadPicture", fields)
+    .then((response) => {
       return response.data;
     })
     .catch((error) => {
@@ -109,6 +121,15 @@ export const getGenresData = async () => {
   }
 };
 
+export const getStudiosData = async () => {
+  try {
+    const response = await api.get("/api/studios/all");
+    return response.data;
+  } catch (error) {
+    console.error("Fetch error: ", error);
+  }
+};
+
 export const getAnimeById = async (id) => {
   try {
     const response = await api.get(`/api/animes/id/${id}`);
@@ -117,4 +138,4 @@ export const getAnimeById = async (id) => {
     console.error("Fetch error: ", error);
     return null;
   }
-}
+};

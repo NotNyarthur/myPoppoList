@@ -6,16 +6,14 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import Box from "@mui/joy/Box";
 
 import Home from "./views/Home";
 import ManageAnime from "./views/ManageAnime";
 import AddAnime from "./views/AddAnime";
 import NavBar from "./components/NavBar";
-import AnimeDetail from "./views/AnimeDetail";
 import AllAnime from "./views/AllAnime";
 import { AuthContext } from "./contexts/AuthContext";
-import { UserProvider, useUser } from "./contexts/UserContext.jsx";
+import { UserProvider } from "./contexts/UserContext.jsx";
 import Login from "./views/Login";
 import AnimeDet from "./views/AnimeDet.jsx";
 
@@ -44,7 +42,14 @@ function App() {
                 </PrivateRoute>
               }
             />
-            <Route path="/addanime" element={<AddAnime />} />
+            <Route
+              path="/addanime"
+              element={
+                <PrivateRoute>
+                  <AddAnime />
+                </PrivateRoute>
+              }
+            />
             <Route path="/allanime" element={<AllAnime />} />
           </Routes>
         </UserProvider>
