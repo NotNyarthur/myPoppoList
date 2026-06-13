@@ -381,7 +381,7 @@ export default function AddAnime() {
         <div className="py-4 text-lg text-center">
           <Button
             startDecorator={<Add />}
-            type="button"
+            type="submit"
             onClick={handleClickOpen}
             disabled={isLoading}
             loadingIndicator="Loading…"
